@@ -6,6 +6,7 @@ async function main() {
     try {
         const vp = await phase_1();
 
+        console.log("여기 추가함");
         console.log("Phase 1 실행 완료, VP:", vp);
 
         const resultPhase_2 = await phase_2(vp);
