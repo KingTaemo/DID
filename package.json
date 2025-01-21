@@ -1,0 +1,51 @@
+{
+  "name": "did_2",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "dependencies": {
+    "@helia/dag-json": "^3.0.5",
+    "@helia/json": "^4.0.1",
+    "@helia/strings": "^3.0.5",
+    "@helia/unixfs": "^3.0.7",
+    "@veramo/core": "^6.0.0",
+    "@veramo/credential-ld": "^6.0.0",
+    "@veramo/credential-w3c": "^6.0.0",
+    "@veramo/data-store": "^6.0.0",
+    "@veramo/did-jwt": "^6.0.0",
+    "@veramo/did-manager": "^6.0.0",
+    "@veramo/did-provider-ethr": "^6.0.0",
+    "@veramo/did-provider-key": "^6.0.0",
+    "@veramo/did-provider-web": "^6.0.0",
+    "@veramo/did-resolver": "^6.0.0",
+    "@veramo/key-manager": "^6.0.0",
+    "@veramo/kms-local": "^6.0.0",
+    "did-resolver": "^4.1.0",
+    "ethers": "6.13",
+    "ethr-did-resolver": "^10.1.10",
+    "helia": "^4.2.5",
+    "ipfs-http-client": "^60.0.1",
+    "key-did-resolver": "^4.0.0",
+    "multiformats": "^13.3.1",
+    "sqlite3": "^5.1.7",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typeorm": "^0.3.20",
+    "typescript": "^5.5.4",
+    "uuid": "^11.0.5",
+    "web-did-resolver": "^2.0.27",
+    "web3": "^4.12.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^22.2.0",
+    "tslib": "^2.6.3"
+  }
+}

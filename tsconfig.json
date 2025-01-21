@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "preserveConstEnums": true,
+    "strict": true,
+    "target": "esnext",
+    "module": "CommonJS",
+    "rootDir": "./",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "downlevelIteration": true
+  },
+  "ts-node": {
+    "esm": true
+  }
+}
