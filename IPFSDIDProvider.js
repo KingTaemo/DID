@@ -1,23 +1,55 @@
-import { uploadToIPFS } from './IPFS-utils.js';
+import { AbstractIdentifierProvider } from '@veramo/did-manager'
+import { create } from 'ipfs-http-client'
+import { uploadToIPFS } from "./IPFS-utils.js";
 
-export class IPFSDIDProvider {
-    async createIdentifier({ alias }) {
-        const didDoc = {
-            "@context": "https://www.w3.org/ns/did/v1",
-            id: `did:ipfs:${alias}`,
+export class IPFSDIDProvider extends AbstractIdentifierProvider {
+    constructor() {
+        super();
+        this.ipfs = create({ host: 'localhost', port: '5001', protocol: 'http' });
+    }
+
+    async createIdentifier(args, context) {
+        const { kms, alias } = args;
+        const didDocument = {
+            '@context': 'https://www.w3.org/ns/did/v1',
+            id: `did:ipfs:${alias || new Date().getTime()}`,
+            verificationMethod: [],
+            authentication: [],
+            assertionMethod: [],
+            service: []
         };
 
-        // IPFS에 DID Document 업로드
-        const cid = await uploadToIPFS(didDoc);
+        const cid = await uploadToIPFS(didDocument);
 
-        //console.log(`DID Document가 IPFS에 저장되었습니다. CID: ${cid}`);
 
-        const key = {
-            kid: `key-${alias}`,
-            kms: 'local',
-            type: 'Secp256k1',
+        return {
+            did: `did:ipfs:${cid.toString()}`,
+            controllerKeyId: `did:ipfs:${cid.toString()}`,
+            keys: [],
+            services: []
         };
+    }
 
-        return { did: `did:ipfs:${cid}`, keys: [key], services: [] };
+    async resolveDid(args, context) {
+        const cid = args.did.replace('did:ipfs:', '');
+        const stream = this.ipfs.cat(cid);
+        let didDocument = '';
+
+        for await (const chunk of stream) {
+            didDocument += chunk.toString();
+        }
+
+        return JSON.parse(didDocument);
+    }
+
+    async updateIdentifier(args, context) {
+        const { cid } = await this.ipfs.add(JSON.stringify(args.document));
+        console.log(`Updated DID: did:ipfs:${cid.toString()}`);
+        return true;
+    }
+
+    async deleteIdentifier(args, context) {
+        console.warn(`IPFS에서는 DID 삭제를 지원하지 않습니다: ${args.did}`);
+        return false;
     }
 }

@@ -35,7 +35,7 @@ import { DataSource } from 'typeorm'
 const DATABASE_FILE = 'database.sqlite'
 
 // You will need to get a project ID from infura https://www.infura.io
-const INFURA_PROJECT_ID = '3586660d179141e3801c3895de1c2eba'
+const INFURA_PROJECT_ID = '16be73a339af47198391a283fa95f400'
 
 // This will be the secret key for the KMS
 const KMS_SECRET_KEY =
@@ -51,7 +51,7 @@ const dbConnection = new DataSource({
     entities: Entities,
 }).initialize()
 
-export const agent = createAgent<IDIDManager & IKeyManager & IDataStore & IDataStoreORM & IResolver & ICredentialPlugin>({
+export const agent= createAgent<IDIDManager & IKeyManager & IDataStore & IDataStoreORM & IResolver & ICredentialPlugin>({
     plugins: [
         new KeyManager({
             store: new KeyStore(dbConnection),
