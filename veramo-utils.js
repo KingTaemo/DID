@@ -5,8 +5,6 @@ import { DIDResolverPlugin } from '@veramo/did-resolver';
 import { KeyManagementSystem } from '@veramo/kms-local';
 import { Resolver } from 'did-resolver';
 import { MyIpfsDidProvider } from './my-ipfs-did-provider.js';
-import { getIpfsDidResolver } from './my-ipfs-did-resolver.js';
-
 
 export const agent = createAgent({
     plugins: [
@@ -20,16 +18,11 @@ export const agent = createAgent({
             defaultProvider: 'did:ipfs',
             store: new MemoryDIDStore(),
             providers: {
-                'did:ipfs': new MyIpfsDidProvider({ ipfsUrl: 'https://ipfs.infura.io:5001/api/v0' }),
+                'did:ipfs': new MyIpfsDidProvider(),
             },
         }),
         new DIDResolverPlugin({
             resolver: new Resolver({})
-        }),
-        new DIDResolverPlugin({
-            resolver: new Resolver({
-                ...getIpfsDidResolver('https://ipfs.infura.io:5001/api/v0')
-            })
         }),
     ]
 });

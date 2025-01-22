@@ -3,7 +3,6 @@ import {strings} from '@helia/strings'
 import { json } from '@helia/json'
 import { CID } from 'multiformats/cid'; // 새롭게 추가한 부분 -> CID로 바꿔줌
 
-
 let heliaInstance = null;
 
 export async function getHeliaInstance() {
@@ -35,14 +34,16 @@ export async function uploadToIPFS(didDoc) {
     }
 }
 
-export async function fetchFromIPFS(did) {
+export async function fetchFromIPFS(origin_cid) {
     const helia = await getHeliaInstance();
 
     const s = strings(helia);
 
     try {
-        const cidString = did.split(':').pop().trim();
-        const cid = CID.parse(cidString);
+
+        console.log("fetcheFromIPFS에서의 CID: ", origin_cid.cid);
+        const cid = CID.parse(origin_cid.cid);
+        console.log(cid);
 
         // IPFS에서 CID를 통해 데이터 검색
         const data = await s.get(cid);
