@@ -1,48 +1,35 @@
-import {
-    createAgent,
-    IDIDManager,
-    IResolver,
-    IDataStore,
-    IDataStoreORM,
-    IKeyManager,
-    ICredentialPlugin,
-} from '@veramo/core'
+import { createAgent } from '@veramo/core';
+import { DIDManager, MemoryDIDStore } from '@veramo/did-manager';
+import { KeyManager, MemoryKeyStore, MemoryPrivateKeyStore } from '@veramo/key-manager';
+import { DIDResolverPlugin } from '@veramo/did-resolver';
+import { KeyManagementSystem } from '@veramo/kms-local';
+import { Resolver } from 'did-resolver';
+import { MyIpfsDidProvider } from './my-ipfs-did-provider.js';
+import { getIpfsDidResolver } from './my-ipfs-did-resolver.js';
 
-import { DIDManager, MemoryDIDStore } from '@veramo/did-manager'
-import { EthrDIDProvider } from "@veramo/did-provider-ethr";
-import { DIDResolverPlugin } from "@veramo/did-resolver";
-import { Resolver } from "did-resolver";
-import {CredentialPlugin} from "@veramo/credential-w3c";
-import {getResolver} from "ethr-did-resolver";
 
-const INFURA_PROJECT_ID = "16be73a339af47198391a283fa95f400";
-
-const ethrDidResolver = new DIDResolverPlugin({
-    resolver: new Resolver({
-        ethr: getResolver( INFURA_PROJECT_ID).ethr,
-    })
-});
-
-const agent = createAgent<
-    IDIDManager & IKeyManager & IDataStore & IDataStoreORM & IResolver & ICredentialPlugin
->({
+export const agent = createAgent({
     plugins: [
-        new DIDManager ({
-            defaultProvider: 'did:ethr',
+        new KeyManager({
+            store: new MemoryKeyStore(),
+            kms: {
+                local: new KeyManagementSystem(new MemoryPrivateKeyStore()),
+            },
+        }),
+        new DIDManager({
+            defaultProvider: 'did:ipfs',
             store: new MemoryDIDStore(),
             providers: {
-                'did:ethr': new EthrDIDProvider({
-                    defaultKms: 'local',
-                    networks: 'sepolia',
-                    rpcUrl: 'https://sepolia.infura.io/v3/16be73a339af47198391a283fa95f400',
-                }),
-            }
+                'did:ipfs': new MyIpfsDidProvider({ ipfsUrl: 'https://ipfs.infura.io:5001/api/v0' }),
+            },
+        }),
+        new DIDResolverPlugin({
+            resolver: new Resolver({})
         }),
         new DIDResolverPlugin({
             resolver: new Resolver({
-                ...ethrDidResolver({ infuraProjectId: INFURA_PROJECT_ID}),
-            }),
+                ...getIpfsDidResolver('https://ipfs.infura.io:5001/api/v0')
+            })
         }),
-        new CredentialPlugin(),
     ]
-})
+});
