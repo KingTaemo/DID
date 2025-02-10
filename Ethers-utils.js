@@ -148,37 +148,61 @@ export async function storeCID(cid) {
         console.error("CID 저장 중 ERROR 발생 ", error);
     }
 }
-export async function getCID() {
+/* CID 비교해서 기다리는 버전 */
+// export async function getCID(cid) {
+//     try {
+//         const provider = new ethers.InfuraProvider(NETWORK, INFURA_ID);
+//         const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
+//         const contract = new ethers.Contract("0x622688b8f9e896f0dcfc6aff8aed3c26b573605a", cid_abi, wallet);
+//
+//         console.log("⏳ 최신 CID 대기 중...");
+//
+//         while (true) {
+//             // 최신 블록 번호 가져오기 (네트워크 동기화)
+//             await provider.getBlockNumber();
+//
+//             // 스마트 컨트랙트에서 최신 CID 조회
+//             const latestCID = await contract.getCID({ blockTag: "latest" });
+//
+//             if (cid === latestCID) {
+//                 console.log("✅ 최신 CID 확인 완료:", latestCID);
+//                 return latestCID; // CID 일치하면 반환 후 종료
+//             }
+//
+//             console.log("⏳ 대기 중... 60초 후 다시 확인");
+//             await new Promise(resolve => setTimeout(resolve, 60000)); // 30초 대기
+//         }
+//     } catch (error) {
+//         console.error("❌ CID를 가져오는 중 오류 발생:", error);
+//         throw error; // 오류 발생 시 상위 함수로 전달
+//     }
+// }
+export async function getCID(cid) {
     try {
         const provider = new ethers.InfuraProvider(NETWORK, INFURA_ID);
         const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
-
         const contract = new ethers.Contract("0x622688b8f9e896f0dcfc6aff8aed3c26b573605a", cid_abi, wallet);
 
-        return await contract.getCID();
+        console.log("⏳ 최신 CID 대기 중...");
 
-
+        return cid;
+        // while (true) {
+        //     // 최신 블록 번호 가져오기 (네트워크 동기화)
+        //     await provider.getBlockNumber();
+        //
+        //     // 스마트 컨트랙트에서 최신 CID 조회
+        //     const latestCID = await contract.getCID({ blockTag: "latest" });
+        //
+        //     if (cid === latestCID) {
+        //         console.log("✅ 최신 CID 확인 완료:", latestCID);
+        //         return latestCID; // CID 일치하면 반환 후 종료
+        //     }
+        //
+        //     console.log("⏳ 대기 중... 60초 후 다시 확인");
+        //     await new Promise(resolve => setTimeout(resolve, 60000)); // 30초 대기
+        //}
     } catch (error) {
-        console.error("CID를 가져오는 중 ERROR 발생 ", error);
-    }
-}
-export async function getDIDandCIDOnBlockchain() {
-    try {
-        const provider = new ethers.JsonRpcProvider(`https://${NETWORK}.infura.io/v3/${INFURA_ID}`);
-        const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
-
-
-        const contractAddress = "0xbb8c5f31f2be2e510b7a6125154d7910ccb6d28e";
-        const contract = new ethers.Contract(contractAddress, abi, wallet);
-
-        // 상태 읽기 함수 호출
-        const cid = await contract.getCID();
-        const did = await contract.getDID();
-
-
-        return { did, cid };
-    } catch (error) {
-        console.error("ERROR:", error);
-        throw error;
+        console.error("❌ CID를 가져오는 중 오류 발생:", error);
+        throw error; // 오류 발생 시 상위 함수로 전달
     }
 }
