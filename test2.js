@@ -40,6 +40,7 @@ async function createVP(vc){
     const did = vc.issuer.id;
     const cid = vc.credentialSubject.cid;
 
+    console.log("VP 발급");
     const verifiablePresentation = await agent.createVerifiablePresentation({
         presentation: {
             holder: did,
