@@ -6,22 +6,22 @@ import { KeyManagementSystem } from '@veramo/kms-local';
 import { Resolver } from 'did-resolver';
 import { MyIpfsDidProvider } from './my-ipfs-did-provider.js';
 import {CredentialPlugin} from "@veramo/credential-w3c";
+import { CID } from 'multiformats/cid';
 
 import {fetchFromIPFS} from "./IPFS-utils.js";
 
-const ipfsDidResolver = {
-    ipfs: async (did) => {
-        console.log("확인 ", did.metadata);
+const didResolver = new Resolver({
+    ipfs: resolveIpfsDID
+});
 
-        const cid = did.metadata;
-
-        const didDoc = await fetchFromIPFS(did, cid);
-
-        return didDoc;
-    }
-}
 export function resolveIpfsDID(did) {
+    console.log("나 호출됨");
+    console.log(typeof(did));
+    //const cid = CID.parse(did.metadata.cid);
+
     const cid = did.metadata;
+
+    console.log("did: ", did);
 
     const didDoc = fetchFromIPFS(cid);
 
@@ -43,9 +43,7 @@ export const agent = createAgent({
             },
         }),
         new DIDResolverPlugin({
-            resolver: new Resolver({
-                ...resolveIpfsDID
-            })
+            resolver: didResolver
         }),
         new CredentialPlugin(),
     ]

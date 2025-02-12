@@ -51,24 +51,21 @@ async function createVP(vc){
         proofFormat: 'jwt',
     })
 
+    console.log("VP 발급 완료");
 
     return verifiablePresentation
 }
 
 async function verifyVP(vp, vp_cid){
-    //const cidGet = await getCID(did.metadata.cid);
-
     const origin_cid = await getCID(vp_cid);
     console.log("origin_cid: ", origin_cid);
 
     const cid = CID.parse(origin_cid);
 
-    // const didDoc = await fetchFromIPFS(cid)
-    // console.log(didDoc);
-
     const result = await agent.verifyPresentation({
         presentation: vp,
-        policies: { proofOfPossession: true }, // proofOfPossession 정책 적용
+        policies: { proofOfPossession: true
+        },
     });
 
     return result;
@@ -76,7 +73,7 @@ async function verifyVP(vp, vp_cid){
 
 async function test(){
     const did = await createIpfsDID();
-    //console.log(did);
+    //console.log();
 
     const didDoc = await resolveIpfsDID(did);
     console.log("생성된 DID Document: ", didDoc);
@@ -92,7 +89,6 @@ async function test(){
 
     const verify_result = await verifyVP(vp, vp.cid);
     console.log(verify_result);
-
 }
 
 test().then();

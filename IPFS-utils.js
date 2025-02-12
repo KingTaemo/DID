@@ -41,7 +41,8 @@ export async function fetchFromIPFS(origin_cid) {
 
     try {
 
-        //console.log("fetcheFromIPFS에서의 CID: ", origin_cid);
+        console.log("fetcheFromIPFS에서의 CID: ", origin_cid);
+
         const cid = CID.parse(origin_cid.cid);
         console.log(cid);
 
