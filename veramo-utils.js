@@ -6,7 +6,8 @@ import { KeyManagementSystem } from '@veramo/kms-local';
 import { Resolver } from 'did-resolver';
 import { MyIpfsDidProvider } from './my-ipfs-did-provider.js';
 import {CredentialPlugin} from "@veramo/credential-w3c";
-import { CID } from 'multiformats/cid';
+
+import { JwtMessageHandler } from '@veramo/did-jwt';
 
 import {fetchFromIPFS} from "./IPFS-utils.js";
 
@@ -15,14 +16,9 @@ const didResolver = new Resolver({
 });
 
 export function resolveIpfsDID(did, ee) {
-    console.log("나 호출됨");
-    console.log(ee);
-    console.log(typeof(did));
     //const cid = CID.parse(did.metadata.cid);
-
     const cid = did.metadata;
 
-    console.log("did: ", did);
 
     const didDoc = fetchFromIPFS(cid);
 
@@ -47,5 +43,6 @@ export const agent = createAgent({
             resolver: didResolver
         }),
         new CredentialPlugin(),
+        new JwtMessageHandler(),
     ]
 });

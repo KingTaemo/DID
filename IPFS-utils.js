@@ -35,23 +35,29 @@ export async function uploadToIPFS(didDoc) {
 }
 
 export async function fetchFromIPFS(origin_cid) {
-    console.trace("여기까지 호출");
+
     const helia = await getHeliaInstance();
-
     const s = strings(helia);
-
     try {
 
-        console.log("fetcheFromIPFS에서의 CID: ", origin_cid);
+        if (typeof(origin_cid) === 'string'){
+            const cid = CID.parse(origin_cid);
 
-        const cid = CID.parse(origin_cid.cid);
-        console.log(cid);
+            // IPFS에서 CID를 통해 데이터 검색
+            const data = await s.get(cid);
 
-        // IPFS에서 CID를 통해 데이터 검색
-        const data = await s.get(cid);
+            // JSON으로 파싱
+            return JSON.parse(data);
+        }
+        else {
+            const cid = CID.parse(origin_cid.cid);
 
-        // JSON으로 파싱
-        return JSON.parse(data);
+            // IPFS에서 CID를 통해 데이터 검색
+            const data = await s.get(cid);
+
+            // JSON으로 파싱
+            return JSON.parse(data);
+        }
 
     } catch (error) {
         console.error("IPFS에서 데이터 가져오기 실패:", error);

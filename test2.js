@@ -1,7 +1,11 @@
 import { agent, resolveIpfsDID } from './veramo-utils.js';
-import {fetchFromIPFS } from './IPFS-utils.js'
+import { fetchFromIPFS } from './IPFS-utils.js'
 import { storeCID, getCID } from "./Ethers-utils.js"
 import { CID } from 'multiformats/cid'; // 새롭게 추가한 부분 -> CID로 바꿔줌
+import { jwtDecode } from 'jwt-decode';
+
+import bs58 from 'bs58';
+import { jwtVerify, importJWK } from 'jose';
 
 async function createIpfsDID() {
     const identifier = await agent.didManagerCreate({
@@ -17,7 +21,6 @@ async function createIpfsDID() {
 
 async function createVC(did){
     const didKeys = await agent.didManagerGet({did: did.did });
-    console.log("didKeys: ", didKeys);
 
     return await agent.createVerifiableCredential({
         credential: {
@@ -40,7 +43,6 @@ async function createVP(vc){
     const did = vc.issuer.id;
     const cid = vc.credentialSubject.cid;
 
-    console.log("VP 발급");
     const verifiablePresentation = await agent.createVerifiablePresentation({
         presentation: {
             holder: did,
@@ -51,8 +53,6 @@ async function createVP(vc){
         },
         proofFormat: 'jwt',
     })
-
-    console.log("VP 발급 완료");
 
     return verifiablePresentation
 }
@@ -72,6 +72,54 @@ async function verifyVP(vp, vp_cid){
     return result;
 }
 
+async function verifyVpSignature(proof, publicKeyStr) {
+    try {
+        // 공개키 문자열이 헥스 형식인지 판단 (0-9, a-f, A-F 만 포함되어 있으면 헥스라고 가정)
+        const isHex = /^[0-9a-fA-F]+$/.test(publicKeyStr);
+
+        // 적절한 디코딩 방식 선택
+        const publicKeyBytes = isHex
+            ? Buffer.from(publicKeyStr, 'hex')
+            : bs58.decode(publicKeyStr);
+
+        // Ed25519 JWK 형식으로 변환 (jose가 요구하는 형식)
+        const jwk = {
+            kty: "OKP",
+            crv: "Ed25519",
+            x: Buffer.from(publicKeyBytes).toString('base64url'),
+        };
+
+        // JWK를 Key 객체로 가져옴
+        const key = await importJWK(jwk, 'EdDSA');
+
+        // JWT 검증 (EdDSA 알고리즘 사용)
+        const { payload, protectedHeader } = await jwtVerify(proof.jwt, key, {
+            algorithms: ['EdDSA'],
+        });
+
+        console.log("✅ JWT 검증 성공:", payload);
+        return true;
+    } catch (err) {
+        console.error("❌ JWT 검증 실패:", err);
+        return false;
+    }
+}
+
+// 사용 예시
+async function testVpSignatureVerification(vp, publicKeyBase58) {
+    const { proof } = vp;
+    if (!proof || !proof.jwt) {
+        throw new Error("VP에 유효한 proof.jwt가 없습니다.");
+    }
+    const isValid = await verifyVpSignature(proof, publicKeyBase58);
+    if (!isValid) {
+        console.error("VP의 서명 검증에 실패했습니다.");
+        return false;
+    }
+    console.log("VP의 서명이 올바릅니다.");
+    return true;
+}
+
 async function test(){
     const did = await createIpfsDID();
     //console.log();
@@ -88,8 +136,13 @@ async function test(){
     const vp = await createVP(vc);
     console.log("생성된 VP: ", vp);
 
-    const verify_result = await verifyVP(vp, vp.cid);
-    console.log(verify_result);
+    const verify_result = await testVpSignatureVerification(vp, didDoc.verificationMethod[0].publicKeyBase58);
+    if (verify_result){
+        console.log("검증 완료");
+    }
+    else {
+        console.log("검증 실패");
+    }
 }
 
 test().then();
