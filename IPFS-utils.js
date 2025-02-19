@@ -35,6 +35,7 @@ export async function uploadToIPFS(didDoc) {
 }
 
 export async function fetchFromIPFS(origin_cid) {
+    console.trace("여기까지 호출");
     const helia = await getHeliaInstance();
 
     const s = strings(helia);

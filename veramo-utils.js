@@ -14,8 +14,9 @@ const didResolver = new Resolver({
     ipfs: resolveIpfsDID
 });
 
-export function resolveIpfsDID(did) {
+export function resolveIpfsDID(did, ee) {
     console.log("나 호출됨");
+    console.log(ee);
     console.log(typeof(did));
     //const cid = CID.parse(did.metadata.cid);
 
