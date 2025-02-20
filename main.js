@@ -1,17 +1,8 @@
-import { phase_1 } from './Phase_1.js'
-import { phase_2 } from './phase_2.js';
+import {step1} from './Step-1.js'
+import {step2} from './Step-2.js'
 
-async function main() {
-    try {
-        const vp = await phase_1();
-
-        console.log("Phase 1 실행 완료, VP:", vp);
-
-        const resultPhase_2 = await phase_2(vp);
-        //console.log(resultPhase_2);
-
-    } catch (error) {
-        console.error("에러 발생:" , error);
-    }
+function main(){
+    step1().then();
+    //step2()
 }
-main().then()
+main();

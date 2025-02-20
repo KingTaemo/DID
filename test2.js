@@ -1,11 +1,7 @@
-import { agent, resolveIpfsDID } from './veramo-utils.js';
-import { fetchFromIPFS } from './IPFS-utils.js'
-import { storeCID, getCID } from "./Ethers-utils.js"
-import { CID } from 'multiformats/cid'; // 새롭게 추가한 부분 -> CID로 바꿔줌
-import { jwtDecode } from 'jwt-decode';
-
+import {agent, resolveIpfsDID} from './veramo-utils.js';
+import {storeCID} from "./Ethers-utils.js"
 import bs58 from 'bs58';
-import { jwtVerify, importJWK } from 'jose';
+import {importJWK, jwtVerify} from 'jose';
 
 async function createIpfsDID() {
     const identifier = await agent.didManagerCreate({
@@ -20,8 +16,6 @@ async function createIpfsDID() {
 }
 
 async function createVC(did){
-    const didKeys = await agent.didManagerGet({did: did.did });
-
     return await agent.createVerifiableCredential({
         credential: {
             issuer: {id: did.did},
@@ -57,30 +51,13 @@ async function createVP(vc){
     return verifiablePresentation
 }
 
-async function verifyVP(vp, vp_cid){
-    const origin_cid = await getCID(vp_cid);
-    console.log("origin_cid: ", origin_cid);
-
-    const cid = CID.parse(origin_cid);
-
-    const result = await agent.verifyPresentation({
-        presentation: vp,
-        policies: { proofOfPossession: true
-        },
-    });
-
-    return result;
-}
-
 async function verifyVpSignature(proof, publicKeyStr) {
     try {
         // 공개키 문자열이 헥스 형식인지 판단 (0-9, a-f, A-F 만 포함되어 있으면 헥스라고 가정)
         const isHex = /^[0-9a-fA-F]+$/.test(publicKeyStr);
 
         // 적절한 디코딩 방식 선택
-        const publicKeyBytes = isHex
-            ? Buffer.from(publicKeyStr, 'hex')
-            : bs58.decode(publicKeyStr);
+        const publicKeyBytes = isHex? Buffer.from(publicKeyStr, 'hex') : bs58.decode(publicKeyStr);
 
         // Ed25519 JWK 형식으로 변환 (jose가 요구하는 형식)
         const jwk = {
@@ -97,15 +74,14 @@ async function verifyVpSignature(proof, publicKeyStr) {
             algorithms: ['EdDSA'],
         });
 
-        console.log("✅ JWT 검증 성공:", payload);
+        console.log("JWT 검증 성공:", payload);
         return true;
     } catch (err) {
-        console.error("❌ JWT 검증 실패:", err);
+        console.error("JWT 검증 실패:", err);
         return false;
     }
 }
 
-// 사용 예시
 async function testVpSignatureVerification(vp, publicKeyBase58) {
     const { proof } = vp;
     if (!proof || !proof.jwt) {
@@ -120,15 +96,22 @@ async function testVpSignatureVerification(vp, publicKeyBase58) {
     return true;
 }
 
+async function updateCID(did, newCID){
+    did.metadata = newCID;
+}
+
 async function test(){
     const did = await createIpfsDID();
-    //console.log();
+    console.log(did.metadata);
 
     const didDoc = await resolveIpfsDID(did);
     console.log("생성된 DID Document: ", didDoc);
 
-    await storeCID(did.metadata.cid);
-    //console.log("Ethereum에 CID 저장");
+    await storeCID (did.metadata.cid);
+    console.log("Ethereum에 CID 저장");
+
+    //await updateCID(did,"test1234");
+
 
     const vc = await createVC(did);
     console.log("생성된 VC", vc);
