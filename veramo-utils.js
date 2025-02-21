@@ -1,5 +1,5 @@
 import {createAgent} from '@veramo/core';
-import {DIDManager, MemoryDIDStore} from '@veramo/did-manager';
+import {DIDManager} from '@veramo/did-manager';
 import {KeyManager, MemoryKeyStore, MemoryPrivateKeyStore} from '@veramo/key-manager';
 import {DIDResolverPlugin} from '@veramo/did-resolver';
 import {KeyManagementSystem} from '@veramo/kms-local';
@@ -32,6 +32,7 @@ export const agent = createAgent({
         }),
         new DIDManager({
             defaultProvider: 'did:ipfs',
+            //store: new MemoryDIDStore(),
             store: fileDIDStore,
             providers: {
                 'did:ipfs': new MyIpfsDidProvider(),

@@ -11,12 +11,12 @@ const rl = createInterface({
     output: process.stdout,
 });
 
-async function createIpfsDID(alice) {
+async function createIpfsDID(alias) {
     //console.log("생성된 DID:", identifier.did);
     //const cid = identifier.metadata.cid
 
     return await agent.didManagerCreate({
-        alias: alice,
+        alias: alias,
         provider: 'did:ipfs'
     });
 }

@@ -46,13 +46,17 @@ export class FileDIDStore {
         return Object.values(this.data);
     }
 
+    async getDID(did) {
+        return this.data[did] || null;
+    }
+
     async importDID(did) {
-        // did 객체에는 최소한 did.did (DID 문자열)가 포함되어야 합니다.
         this.data[did.did] = did;
         this.save();
         return did;
     }
 
+    // DID를 삭제
     async deleteDID(did) {
         delete this.data[did.did];
         this.save();
