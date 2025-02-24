@@ -6,14 +6,13 @@ import {KeyManagementSystem} from '@veramo/kms-local';
 import {Resolver} from 'did-resolver';
 import {MyIpfsDidProvider} from './my-ipfs-did-provider.js';
 import {CredentialPlugin} from "@veramo/credential-w3c";
-import {fileDIDStore} from "./file-did-store.js";
+import {fileDIDStore} from "./file-did-store_ver2.js";
 import {JwtMessageHandler} from '@veramo/did-jwt';
-
 import {fetchFromIPFS} from "./IPFS-utils.js";
 
 
 const didResolver = new Resolver({
-    ipfs: resolveIpfsDID
+    'ipfs': resolveIpfsDID
 });
 
 export function resolveIpfsDID(did) {
